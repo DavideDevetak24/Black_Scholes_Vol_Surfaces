@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import norm
 from scipy.optimize import newton
 
+
 #Choose either 'Call' or 'Put'
 def black_scholes(S, K, r, T, sigma, q, option_type):
     d1 = (np.log(S / K) + (r - q + (sigma**2 / 2)) * T) / (sigma * np.sqrt(T))
@@ -20,15 +21,13 @@ def black_scholes(S, K, r, T, sigma, q, option_type):
         print('Wrong option type: choose between "Call" and "Put"')
 
 
-
-
 def implied_volatility(market_price, S, K, r, T, q, option_type):
     def objective_function(sigma):
         price = black_scholes(S, K, r, T, sigma, q, option_type)
         return price - market_price
     
     try:
-        # Use newton raphson in a reasonable range for volatility
+        # Use newton raphson with an initial vol guess of 0.1
         return newton(objective_function, 0.10)
     except ValueError:
         return np.nan
