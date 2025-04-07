@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import norm
 from scipy.optimize import newton
 
+#Choose either 'Call' or 'Put'
 def black_scholes(S, K, r, T, sigma, q, option_type):
     d1 = (np.log(S / K) + (r - q + (sigma**2 / 2)) * T) / (sigma * np.sqrt(T))
     d2 = (np.log(S / K) + (r - q - (sigma**2 / 2)) * T) / (sigma * np.sqrt(T))
