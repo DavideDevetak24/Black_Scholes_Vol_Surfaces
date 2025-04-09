@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import norm
 from scipy.optimize import newton
 from mpl_toolkits.mplot3d import Axes3D
+from scipy.interpolate import griddata
 
 
 #Choose either 'Call' or 'Put'
@@ -21,7 +22,7 @@ def black_scholes(S, K, r, T, sigma, q, option_type):
     else:
         print('Wrong option type: choose between "Call" and "Put"')
 
-
+#Implied vol algo. The idea is to make BS price and market price converge by adjusting sigma with Newton-Raphson
 def implied_volatility(market_price, S, K, r, T, q, option_type):
     def objective_function(sigma):
         price = black_scholes(S, K, r, T, sigma, q, option_type)
@@ -68,8 +69,6 @@ flat_data = {
 
 data = pd.DataFrame(flat_data)
 
-#print(data)
-
 data['IV'] = data.apply(lambda row: implied_volatility(
     row['market_prices'], 
     row['S'], 
@@ -79,21 +78,31 @@ data['IV'] = data.apply(lambda row: implied_volatility(
     row['q'], 
     row['option_type']), axis=1)
 
-
-#add interpolation part. Use fixed intervals
-
-
-#cool chart
 K_vals = data['K'].values
 T_vals = data['T'].values
 IV_vals = data['IV'].values
 
+#Creation of a grid to interpolate values
+K_grid_lin = np.linspace(min(K_vals), max(K_vals), 50)
+T_grid_lin = np.linspace(min(T_vals), max(T_vals), 50)
+K_grid, T_grid = np.meshgrid(K_grid_lin, T_grid_lin)
+
+IV_grid = griddata(
+    points=(K_vals, T_vals),
+    values=IV_vals,
+    xi=(K_grid, T_grid),
+    method='linear'  #use linear or cubic (cubic is smoother)
+)
+
 fig = plt.figure(figsize=(10, 7))
 ax = fig.add_subplot(111, projection='3d')
-#also viridis or find red/blue
-ax.plot_trisurf(K_vals, T_vals, IV_vals, cmap='YlGnBu', edgecolor='none')
 
-ax.set_title('Implied Volatility Surface')
+surf = ax.plot_surface(K_grid, T_grid, IV_grid, cmap='YlGnBu', edgecolor='none')
+
+cbar = fig.colorbar(surf, ax=ax, shrink=0.5, aspect=10)
+cbar.set_label('Implied Volatility')
+
+ax.set_title('Interpolated Implied Volatility Surface')
 ax.set_xlabel('Strike Price (K)')
 ax.set_ylabel('Time to Maturity (T)')
 ax.set_zlabel('Implied Volatility (IV)')
