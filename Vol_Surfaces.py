@@ -80,6 +80,9 @@ data['IV'] = data.apply(lambda row: implied_volatility(
     row['option_type']), axis=1)
 
 
+#add interpolation part. Use fixed intervals
+
+
 #cool chart
 K_vals = data['K'].values
 T_vals = data['T'].values
@@ -87,7 +90,8 @@ IV_vals = data['IV'].values
 
 fig = plt.figure(figsize=(10, 7))
 ax = fig.add_subplot(111, projection='3d')
-ax.plot_trisurf(K_vals, T_vals, IV_vals, cmap='viridis', edgecolor='none')
+#also viridis or find red/blue
+ax.plot_trisurf(K_vals, T_vals, IV_vals, cmap='YlGnBu', edgecolor='none')
 
 ax.set_title('Implied Volatility Surface')
 ax.set_xlabel('Strike Price (K)')
