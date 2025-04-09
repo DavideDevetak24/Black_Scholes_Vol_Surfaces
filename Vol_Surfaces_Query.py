@@ -12,6 +12,8 @@ from tkinter import ttk
 
 
 #Choose either 'Call' or 'Put' !!!
+#Remember that the vol surface plot works with real data only for one between put and call
+#In theory the two IVs should be equal, but in practice they differ, so there's the need for two vol surfaces
 def black_scholes(S, K, r, T, sigma, q, option_type):
     d1 = (np.log(S / K) + (r - q + (sigma**2 / 2)) * T) / (sigma * np.sqrt(T))
     d2 = (np.log(S / K) + (r - q - (sigma**2 / 2)) * T) / (sigma * np.sqrt(T))
