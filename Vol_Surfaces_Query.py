@@ -166,7 +166,7 @@ right_frame.pack(side='right', fill='both', expand=True)
 fig = plt.figure(figsize=(6, 5))
 ax = fig.add_subplot(111, projection='3d')
 
-surf = ax.plot_surface(K_grid, T_grid, IV_grid, cmap='YlGnBu', edgecolor='none')
+surf = ax.plot_surface(K_grid, T_grid, IV_grid, cmap='YlGnBu', edgecolor='none') #YlGnBu , coolwarm
 cbar = fig.colorbar(surf, ax=ax, shrink=0.5, aspect=10)
 cbar.set_label('Implied Volatility')
 
