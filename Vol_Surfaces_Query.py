@@ -108,6 +108,7 @@ iv_interpolator = RegularGridInterpolator(
     bounds_error=True
 )
 
+
 def surface_query(K, T):
     try:
         IV = iv_interpolator([[T, K]])[0] #remember it retruns and array! So [0]
@@ -115,8 +116,6 @@ def surface_query(K, T):
         return BS_price, IV
     except:
         return np.nan, np.nan
-
-#print(surface_query(53.67, 1.5))
 
 
 #cool interface

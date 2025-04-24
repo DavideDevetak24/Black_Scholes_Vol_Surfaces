@@ -55,7 +55,7 @@ def black_scholes(S, K, r, T, sigma, q, option_type='Call'):
     else:
         print('Wrong option type: choose between "Call" and "Put"')
 
-#Implied vol algo. The idea is to make BS price and market price converge by adjusting sigma with Newton-Raphson
+#Implied vol algo. The idea is to make BS price and market price converge by adjusting sigma with brentq/Newton-Raphson
 def implied_volatility(market_price, S, K, r, T, q, option_type):
     def objective_function(sigma):
         price = black_scholes(S, K, r, T, sigma, q, option_type)
@@ -67,7 +67,7 @@ def implied_volatility(market_price, S, K, r, T, q, option_type):
             1e-4, 
             3.0, 
             xtol=1e-6)
-    except ValueError:
+    except ValueError:        
         try:
             return newton(
                 objective_function,
@@ -101,18 +101,18 @@ put_chains['IV'] = put_chains.apply(lambda row: implied_volatility(
 call_chains = call_chains.dropna()
 put_chains = put_chains.dropna()
 
-K_vals = call_chains['K'].values
-T_vals = call_chains['T'].values
-IV_vals = call_chains['IV'].values
+K_vals_call = call_chains['K'].values
+T_vals_call = call_chains['T'].values
+IV_vals_call = call_chains['IV'].values
 
 #Creation of a grid to interpolate values
-K_grid_lin = np.linspace(min(K_vals), max(K_vals), 1000)
-T_grid_lin = np.linspace(min(T_vals), max(T_vals), 1000)
+K_grid_lin = np.linspace(min(K_vals_call), max(K_vals_call), 1000)
+T_grid_lin = np.linspace(min(T_vals_call), max(T_vals_call), 1000)
 K_grid, T_grid = np.meshgrid(K_grid_lin, T_grid_lin)
 
 IV_grid = griddata(
-    points=(K_vals, T_vals),
-    values=IV_vals,
+    points=(K_vals_call, T_vals_call),
+    values=IV_vals_call,
     xi=(K_grid, T_grid),
     method='cubic'  #use linear or cubic (cubic is smoother)
 )
@@ -120,25 +120,39 @@ IV_grid = griddata(
 IV_vals_put = put_chains['IV'].values
 K_vals_put = put_chains['K'].values
 T_vals_put = put_chains['T'].values
+
 IV_grid_put = griddata(
     points = (K_vals_put, T_vals_put), 
     values = IV_vals_put, 
     xi = (K_grid, T_grid), 
-    method='cubic')
+    method='cubic'
+)
 
 #Turn the IV_grid into a continuous function
-iv_interpolator = RegularGridInterpolator(
-    (T_grid_lin, K_grid_lin),  #order T, then K
+iv_interpolator_call = RegularGridInterpolator(
+    (T_grid_lin, K_grid_lin),  # order T, then K
     IV_grid,
     bounds_error=True
 )
 
-def surface_query(K, T):
+iv_interpolator_put = RegularGridInterpolator(
+    (T_grid_lin, K_grid_lin),  # order T, then K
+    IV_grid_put,
+    bounds_error=True
+)
+
+def surface_query(K, T, option_type='Call'):
     try:
-        IV = iv_interpolator([[T, K]])[0] #remember it retruns and array! So [0]
-        BS_price = black_scholes(S, K, r, T, IV, q, option_type='Call')
+        if option_type == 'Call':
+            IV = iv_interpolator_call([[T, K]])[0]
+        elif option_type == 'Put':
+            IV = iv_interpolator_put([[T, K]])[0]
+        else:
+            raise ValueError("Dude, tf")
+        
+        BS_price = black_scholes(S, K, r, T, IV, q, option_type)
         return BS_price, IV
-    except:
+    except Exception as e:
         return np.nan, np.nan
 
 
@@ -164,22 +178,38 @@ ttk.Label(left_frame, text="Time to Maturity (T):").pack(anchor='w')
 time_entry = ttk.Entry(left_frame)
 time_entry.pack(fill='x')
 
-result_label = ttk.Label(left_frame, text="", font=('Arial', 9), foreground='Black')
-result_label.pack(pady=20)
+ttk.Label(left_frame, text="Query Option Type:").pack(anchor='w')
+query_option_type_var = tk.StringVar(value="Call")
+query_option_type_menu = ttk.Combobox(left_frame, textvariable=query_option_type_var, state="readonly")
+query_option_type_menu['values'] = ("Call", "Put")
+query_option_type_menu.pack(fill='x', pady=5)
 
 def query_surface():
     try:
         K = float(strike_entry.get())
         T = float(time_entry.get())
-        BS_price, IV = surface_query(K, T)
+        selected = query_option_type_var.get()
+
+        if selected == "Put":
+            BS_price, IV = surface_query(K, T, option_type="Put")
+        elif selected == "Call":
+            BS_price, IV = surface_query(K, T, option_type="Call")
+        else:
+            result_label.config(text="Bruh")
+            return
+
         if np.isnan(IV):
             result_label.config(text="Outside data range/invalid input :-(")
         else:
-            result_label.config(text=f"IV: {IV:.4f}\nBS Price: {BS_price:.4f}")
+            result_label.config(text=f"{selected} IV: {IV:.4f}\nBS Price: {BS_price:.4f}")
+
     except Exception as e:
         result_label.config(text=f"Error: {str(e)}")
 
 ttk.Button(left_frame, text="Calculate IV and Price", command=query_surface).pack(pady=10)
+
+result_label = ttk.Label(left_frame, text="", font=('Arial', 9), foreground='Black')
+result_label.pack(pady=20)
 
 #right frame
 right_frame = ttk.Frame(main_frame)
