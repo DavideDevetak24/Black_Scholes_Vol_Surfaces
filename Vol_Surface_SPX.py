@@ -96,10 +96,12 @@ put_chains['IV'] = put_chains.apply(lambda row: implied_volatility(
     row['q'], 
     row['option_type']), axis=1)
 
-#call_chains.to_excel("C:/Users/Mio/OneDrive/Code_files/Uni_Quant/Derivatives/Option_Data/Options_Finished_File/call_chains.xlsx", index=True)
 
 call_chains = call_chains.dropna()
 put_chains = put_chains.dropna()
+
+call_chains.to_excel("C:/Users/Mio/OneDrive/Code_files/Uni_Quant/Derivatives/Option_Data/Options_Finished_File/call_chains.xlsx", index=True)
+put_chains.to_excel("C:/Users/Mio/OneDrive/Code_files/Uni_Quant/Derivatives/Option_Data/Options_Finished_File/put_chains.xlsx", index=True)
 
 K_vals_call = call_chains['K'].values
 T_vals_call = call_chains['T'].values
@@ -114,7 +116,7 @@ IV_grid = griddata(
     points=(K_vals_call, T_vals_call),
     values=IV_vals_call,
     xi=(K_grid, T_grid),
-    method='cubic'  #use linear or cubic (cubic is smoother)
+    method='linear'  #use linear or cubic (cubic is smoother, but for real data sometimes makes a mess)
 )
 
 IV_vals_put = put_chains['IV'].values
@@ -125,7 +127,7 @@ IV_grid_put = griddata(
     points = (K_vals_put, T_vals_put), 
     values = IV_vals_put, 
     xi = (K_grid, T_grid), 
-    method='cubic'
+    method='linear'
 )
 
 #Turn the IV_grid into a continuous function
