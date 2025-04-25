@@ -9,9 +9,9 @@ from scipy.interpolate import griddata
 
 
 #option chains data from April 17th 2025
-data = pd.read_excel("C:/Users/Mio/OneDrive/Code_files/Uni_Quant/Derivatives/Option_Data/Options_Finished_File/Option_Data_Test.xlsx")
+data = pd.read_excel("C:/Users/Mio/OneDrive/Code_files/Uni_Quant/Derivatives/Option_Data/Options_Finished_File/Option_Data.xlsx")
 
-S = 5275.70
+S = 5330.45
 q = 0.01387
 r = 0.0396
 
@@ -93,7 +93,6 @@ put_chains['IV'] = put_chains.apply(lambda row: implied_volatility(
     row['q'], 
     row['option_type']), axis=1)
 
-
 call_chains = call_chains.dropna()
 put_chains = put_chains.dropna()
 
@@ -112,7 +111,6 @@ z_call = IV_vals_call
 x_put = K_vals_put
 y_put = T_vals_put
 z_put = IV_vals_put
-
 
 def chart(x, y, z):
     X, Y = np.meshgrid(np.unique(x), np.unique(y))

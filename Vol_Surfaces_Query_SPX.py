@@ -12,9 +12,9 @@ from tkinter import ttk
 
 
 #option chains data from April 17th 2025
-data = pd.read_excel("C:/Users/Mio/OneDrive/Code_files/Uni_Quant/Derivatives/Option_Data/Options_Finished_File/Option_Data_Test.xlsx")
+data = pd.read_excel("C:/Users/Mio/OneDrive/Code_files/Uni_Quant/Derivatives/Option_Data/Options_Finished_File/Option_Data.xlsx")
 
-S = 5275.70
+S = 5330.70
 q = 0.01387
 r = 0.0396
 
@@ -61,11 +61,15 @@ def implied_volatility(market_price, S, K, r, T, q, option_type):
         price = black_scholes(S, K, r, T, sigma, q, option_type)
         return price - market_price
 
+    #in this case preferable brentq as the initial estimate could be very far away from
+    # the real IV 
     try:
         return brentq(
             objective_function, 
-            1e-4, 
-            3.0, 
+            1e-4,
+            #for the option used sometimes vol for low strikes reaches 20.0, 
+            # brentq capped at 3.0
+            3.0,
             xtol=1e-6)
     except ValueError:        
         try:
@@ -79,7 +83,7 @@ def implied_volatility(market_price, S, K, r, T, q, option_type):
 
 
 call_chains['IV'] = call_chains.apply(lambda row: implied_volatility(
-    row['market_prices'], 
+    row['market_prices'],
     row['S'], 
     row['K'], 
     row['r'], 
@@ -100,8 +104,8 @@ put_chains['IV'] = put_chains.apply(lambda row: implied_volatility(
 call_chains = call_chains.dropna()
 put_chains = put_chains.dropna()
 
-call_chains.to_excel("C:/Users/Mio/OneDrive/Code_files/Uni_Quant/Derivatives/Option_Data/Options_Finished_File/call_chains.xlsx", index=True)
-put_chains.to_excel("C:/Users/Mio/OneDrive/Code_files/Uni_Quant/Derivatives/Option_Data/Options_Finished_File/put_chains.xlsx", index=True)
+#call_chains.to_excel("C:/Users/Mio/OneDrive/Code_files/Uni_Quant/Derivatives/Option_Data/Options_Finished_File/call_chains.xlsx", index=True)
+#put_chains.to_excel("C:/Users/Mio/OneDrive/Code_files/Uni_Quant/Derivatives/Option_Data/Options_Finished_File/put_chains.xlsx", index=True)
 
 K_vals_call = call_chains['K'].values
 T_vals_call = call_chains['T'].values
