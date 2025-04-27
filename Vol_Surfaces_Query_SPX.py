@@ -12,9 +12,9 @@ from tkinter import ttk
 
 
 #option chains data from April 17th 2025
-data = pd.read_excel("C:/Users/Mio/OneDrive/Code_files/Uni_Quant/Derivatives/Option_Data/Options_Finished_File/Option_Data.xlsx")
+data = pd.read_excel("C:/Users/Mio/OneDrive/Code_files/Uni_Quant/Derivatives/Option_Data/Options_Finished_File/Option_Data_17_Apr_2025.xlsx")
 
-S = 5330.70
+S = 5335.75
 q = 0.01387
 r = 0.0396
 
@@ -100,7 +100,6 @@ put_chains['IV'] = put_chains.apply(lambda row: implied_volatility(
     row['q'], 
     row['option_type']), axis=1)
 
-
 call_chains = call_chains.dropna()
 put_chains = put_chains.dropna()
 
@@ -147,7 +146,6 @@ iv_interpolator_put = RegularGridInterpolator(
     bounds_error=True
 )
 
-
 def surface_query(K, T, option_type='Call'):
     try:
         if option_type == 'Call':
@@ -155,7 +153,7 @@ def surface_query(K, T, option_type='Call'):
         elif option_type == 'Put':
             IV = iv_interpolator_put([[T, K]])[0]
         else:
-            raise ValueError("Dude, tf")
+            raise ValueError("Dude, what?")
         
         BS_price = black_scholes(S, K, r, T, IV, q, option_type)
         return BS_price, IV
@@ -236,10 +234,10 @@ def update_surface_plot():
     selected = option_type_var.get()
 
     if selected == "Call" or selected == "Both":
-        ax.plot_surface(K_grid, T_grid, IV_grid, cmap='YlGnBu', edgecolor='none', alpha=0.8, label="Call")
+        ax.plot_surface(K_grid, T_grid, IV_grid, cmap='viridis', edgecolor='none', alpha=0.8, label="Call")
 
     if selected == "Put" or selected == "Both":
-        ax.plot_surface(K_grid, T_grid, IV_grid_put, cmap='Reds', edgecolor='none', alpha=0.8, label="Put")
+        ax.plot_surface(K_grid, T_grid, IV_grid_put, cmap='YlOrRd', edgecolor='none', alpha=0.8, label="Put")
 
     ax.set_title('Volatility Surface')
     ax.set_xlabel('Strike Price (K)')
@@ -252,7 +250,7 @@ ttk.Button(left_frame, text="Update Chart", command=update_surface_plot).pack(pa
 
 fig = plt.figure(figsize=(6, 5))
 ax = fig.add_subplot(111, projection='3d')
-surf = ax.plot_surface(K_grid, T_grid, IV_grid, cmap='YlGnBu', edgecolor='none')
+surf = ax.plot_surface(K_grid, T_grid, IV_grid, cmap='viridis', edgecolor='none') #YlGnBu
 cbar = fig.colorbar(surf, ax=ax, shrink=0.5, aspect=10)
 cbar.set_label('Implied Volatility')
 
