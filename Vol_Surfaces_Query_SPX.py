@@ -12,7 +12,7 @@ from tkinter import ttk
 
 
 #option chains data from April 17th 2025
-data = pd.read_excel("C:/Users/Mio/OneDrive/Code_files/Uni_Quant/Derivatives/Option_Data/Options_Finished_File/Option_Data_17_Apr_2025.xlsx")
+data = pd.read_excel("Data/Option_Data_17_Apr_2025.xlsx")
 
 S = 5335.75
 q = 0.01387
