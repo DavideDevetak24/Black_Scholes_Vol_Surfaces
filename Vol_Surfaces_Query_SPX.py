@@ -46,7 +46,6 @@ def black_scholes(S, K, r, T, sigma, q, option_type='Call'):
     d2 = (np.log(S / K) + (r - q - (sigma**2 / 2)) * T) / (sigma * np.sqrt(T))
 
     if option_type == 'Call':
-        #check norm.cfd (do not use only norm)
         call = (S * np.exp(-q * T) * norm.cdf(d1)) - (K * np.exp(-r * T) * norm.cdf(d2))
         return call
     if option_type == 'Put':        
