@@ -104,8 +104,6 @@ call_chains = call_chains.dropna()
 put_chains = put_chains.dropna()
 
 
-#put_chains.to_excel("C:/Users/Mio/OneDrive/Code_files/Uni_Quant/Derivatives/Option_Data/Options_Finished_File/put_chains.xlsx", index=True)
-
 K_vals_call = call_chains['K'].values
 T_vals_call = call_chains['T'].values
 IV_vals_call = call_chains['IV'].values
