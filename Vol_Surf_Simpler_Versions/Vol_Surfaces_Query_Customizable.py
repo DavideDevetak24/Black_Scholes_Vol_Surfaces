@@ -19,7 +19,6 @@ def black_scholes(S, K, r, T, sigma, q, option_type):
     d2 = (np.log(S / K) + (r - q - (sigma**2 / 2)) * T) / (sigma * np.sqrt(T))
 
     if option_type == 'Call':
-        #norm.cfd (do not use only norm)
         call = (S * np.exp(-q * T) * norm.cdf(d1)) - (K * np.exp(-r * T) * norm.cdf(d2))
         return call
     if option_type == 'Put':
@@ -28,7 +27,6 @@ def black_scholes(S, K, r, T, sigma, q, option_type):
     else:
         print('Wrong option type: choose between "Call" and "Put"')
 
-#print(black_scholes(50, 45, 0.02, 1, 0.2, 0, 'Call'))
 
 #Implied vol algo. The idea is to make BS price and market price converge by adjusting sigma with Newton-Raphson
 def implied_volatility(market_price, S, K, r, T, q, option_type):
@@ -41,8 +39,6 @@ def implied_volatility(market_price, S, K, r, T, q, option_type):
         return newton(objective_function, 0.10)
     except ValueError:
         return np.nan
-
-#print(implied_volatility(7.5, 50, 45, 0.02, 1, 0, 'Call'))
 
 #Generating random data to double check the vol algo
 #Used tuples just to visualize better. No need to flatten, use just real df on option chain data
