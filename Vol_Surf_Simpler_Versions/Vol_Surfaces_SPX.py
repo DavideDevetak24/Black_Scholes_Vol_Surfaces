@@ -9,7 +9,7 @@ from scipy.interpolate import griddata
 
 
 #option chains data from April 17th 2025
-data = pd.read_excel("Option_Data_17_Apr_2025.xlsx")
+data = pd.read_excel("Data/Option_Data_17_Apr_2025.xlsx")
 S = 5330.45
 q = 0.01387
 r = 0.0396
